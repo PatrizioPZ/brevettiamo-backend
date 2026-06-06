@@ -7,10 +7,10 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 
-const { generalLimiter, aiServiceLimiter, webhookLimiter } = require('./middleware/rateLimiter');
-const servicesRouter = require('./routes/api/services');
-const webhookRouter = require('./routes/api/webhook');
-const userRouter = require('./routes/api/user');
+const { generalLimiter, aiServiceLimiter, webhookLimiter } = require('./rateLimiter');const { generalLimiter, aiServiceLimiter, webhookLimiter } = require('./rateLimiter');
+const servicesRouter = require('./services');
+const webhookRouter = require('./webhook');
+const userRouter = require('./user');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
