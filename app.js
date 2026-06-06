@@ -82,11 +82,11 @@ app.post('/api/services/execute', async (req, res) => {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://patriziopz.github.io',
+model: 'meta-llama/llama-3.1-8b-instruct',
         'X-Title': 'BrevettIAmo'
       },
       body: JSON.stringify({
-        model: 'moonshot-ai/moonshot-v1-8k',
+       model: 'meta-llama/llama-3.1-8b-instruct', 
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Lingua: ${language}\n\n${input}` }
