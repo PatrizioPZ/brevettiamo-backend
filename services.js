@@ -228,7 +228,7 @@ function getOutputFormat(key) {
     'strategia-deposito': 'Roadmap con calendario e budget',
     'valutazione-economica': 'Report valutazione con range',
     'due-diligence': 'Report due diligence completo',
-    'contratti-licenza': 'Template contratto pronto all'uso',
+    'contratti-licenza': "Template contratto pronto all'uso",
     'analisi-invalidita': 'Report invalidita con probabilita',
     'gestione-scadenze': 'Calendario e alert system',
     'cad-professionale': 'Istruzioni CAD con stima costi'
