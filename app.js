@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
 
-const { generalLimiter, aiServiceLimiter, webhookLimiter } = require('./rateLimiter');const { generalLimiter, aiServiceLimiter, webhookLimiter } = require('./rateLimiter');
+const { generalLimiter, aiServiceLimiter, webhookLimiter } = require('./rateLimiter');
 const servicesRouter = require('./services');
 const webhookRouter = require('./webhook');
 const userRouter = require('./user');
