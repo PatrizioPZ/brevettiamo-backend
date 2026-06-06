@@ -2,8 +2,8 @@
 // Servizio principale per chiamate AI (OpenRouter) - 19 servizi
 
 const axios = require('axios');
-const { AI_CONFIG, SYSTEM_PROMPTS, SERVICE_MAP } = require('../config/ai-config');
-const { supabase, TABLES } = require('../config/database');
+const { AI_CONFIG, SYSTEM_PROMPTS, SERVICE_MAP } = require('./ai-config');
+const { supabase, TABLES } = require('./database');
 const { v4: uuidv4 } = require('uuid');
 
 class AIService {
