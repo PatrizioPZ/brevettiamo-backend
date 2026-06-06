@@ -81,7 +81,7 @@ router.post('/execute', authenticateUser, async (req, res) => {
   } catch (err) {
     console.error('Errore esecuzione servizio:', err);
     res.status(500).json({
-      error: 'Errore durante l'elaborazione',
+error: "Errore durante l'elaborazione",
       message: err.message
     });
   }
