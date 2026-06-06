@@ -3,9 +3,9 @@
 
 const express = require('express');
 const router = express.Router();
-const aiService = require('../../services/ai-service');
-const { SERVICE_MAP } = require('../../config/ai-config');
-const { supabase, TABLES } = require('../../config/database');
+const aiService = require('./ai-service');
+const { SERVICE_MAP } = require('./ai-config');
+const { supabase, TABLES } = require('./database');
 const Joi = require('joi');
 
 // Schema validazione
