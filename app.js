@@ -57,7 +57,7 @@ app.get('/api/services/list', (req, res) => {
 
 // ========== ESEGUI SERVIZIO AI ==========
 app.post('/api/services/execute', async (req, res) => {
-  const { serviceId, input, language = 'it' } = req.body;
+  { role: 'user', content: `Lingua richiesta: ${language === 'it-en' ? 'Italiano e English (bilingue)' : language}\n\n${input}` }
 
   if (!serviceId || !input) {
     return res.status(400).json({ error: 'serviceId e input richiesti' });
