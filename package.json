@@ -2,7 +2,7 @@
   "name": "brevettiamo-backend",
   "version": "1.0.0",
   "description": "Backend AI per BrevettIAmo - 19 servizi AI + CAD",
-  "main": "src/app.js",
+  "main": "app.js",
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
