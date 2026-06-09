@@ -237,6 +237,9 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Errore interno server' });
 });
 
+// ========== CONFIGURAZIONI ADMIN ==========
+const configRouter = require('./routes/config-api');
+app.use('/api', configRouter);
 app.listen(PORT, () => {
   console.log(`BrevettIAmo 19 Intelligenze - Porta ${PORT}`);
   console.log(`DB: ${process.env.SUPABASE_URL ? 'CONNESSO' : 'MANCANTE'}`);
