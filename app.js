@@ -328,6 +328,10 @@ const configRouter = require('./routes/config-api');
 app.use('/api', configRouter);
 
 // ========== AVVIO SERVER (DEVE ESSERE L'ULTIMO!) ==========
+// Route per chatbot HTML
+app.get('/chatbot', (req, res) => {
+  res.send(`...HTML completo...`);
+});
 app.listen(PORT, () => {
   console.log(`BrevettIAmo 19 Intelligenze - Porta ${PORT}`);
   console.log(`DB: ${process.env.SUPABASE_URL ? 'CONNESSO' : 'MANCANTE'}`);
