@@ -16,7 +16,24 @@ app.use(cors({
 }));
 
 app.use(express.json({ limit: '10mb' }));
+app.post('/chat', async (req, res) => {
+  try {
+    const { message } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: 'Messaggio richiesto' });
+    }
 
+    // Risposta di test - senza chiamare Gemini
+    res.json({ 
+      reply: 'Test OK! Hai scritto: ' + message,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 // ============================================
 // CHATBOT - GOOGLE GEMINI (PRIMA di app.listen!)
 // ============================================
