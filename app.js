@@ -395,6 +395,72 @@ app.use((err, req, res, next) => {
 const configRouter = require('./routes/config-api');
 app.use('/api', configRouter);
 
+// ============================================
+// CHATBOT - OPENROUTER (usando key già configurata)
+// ============================================
+
+app.post('/chat', async (req, res) => {
+  try {
+    const { message, history } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: 'Messaggio richiesto' });
+    }
+
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    
+    if (!apiKey) {
+      return res.status(500).json({ 
+        error: 'OpenRouter API Key mancante',
+        message: 'Configura OPENROUTER_API_KEY su Render'
+      });
+    }
+
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey,
+        'HTTP-Referer': 'https://patriziopz.github.io',
+        'X-Title': 'BrevettIAmo'
+      },
+      body: JSON.stringify({
+        model: 'meta-llama/llama-3.1-8b-instruct:free',
+        messages: [
+          {
+            role: 'system',
+            content: 'Sei l assistente AI di BrevettIAmo, piattaforma italiana per gestione pratiche brevettuali. Rispondi in italiano, professionale ma accessibile.'
+          },
+          {
+            role: 'user',
+            content: message
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 800
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('OpenRouter error: ' + response.status);
+    }
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || 'Errore risposta';
+
+    res.json({ 
+      reply: reply,
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Chat error:', error);
+    res.status(500).json({ 
+      error: 'Errore server',
+      message: error.message 
+    });
+  }
+});
 // ========== AVVIO SERVER (DEVE ESSERE L'ULTIMO!) ==========
 app.listen(PORT, () => {
   console.log(`BrevettIAmo 19 Intelligenze - Porta ${PORT}`);
