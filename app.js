@@ -10,14 +10,15 @@ const PORT = process.env.PORT || 3000;
 
 // CORS
 app.use(cors({
-  origin: ['https://patriziopz.github.io', 'http://localhost:3000'],
+  origin: ['https://patriziopz.github.io', 'https://patriziopz.github.io/brevettiamo', 'http://localhost:3000'],
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json({ limit: '10mb' }));
+
 // ============================================
-// CHATBOT - GOOGLE GEMINI
+// CHATBOT - GOOGLE GEMINI (PRIMA di app.listen!)
 // ============================================
 
 app.post('/chat', async (req, res) => {
@@ -68,7 +69,6 @@ app.post('/chat', async (req, res) => {
     const data = await response.json();
     
     if (data.error) {
-      console.error('Gemini error:', data.error);
       return res.status(500).json({ 
         error: 'Gemini API error',
         details: data.error.message || 'Errore sconosciuto'
@@ -90,106 +90,8 @@ app.post('/chat', async (req, res) => {
     });
   }
 });
-// ============================================
-// CHATBOT - GOOGLE GEMINI INTEGRATION
-// ============================================
 
-// Endpoint chatbot
-app.post('/chat', async (req, res) => {
-  try {
-    const { message, history } = req.body;
-    
-    if (!message) {
-      return res.status(400).json({ error: 'Messaggio richiesto' });
-    }
-
-    // System prompt per contesto BrevettIAmo
-    const systemPrompt = `Sei l'assistente AI di BrevettIAmo, piattaforma italiana per gestione pratiche brevettuali. 
-Aiuti con: servizi deposito brevetti, procedure UIBM, costi pacchetti (Starter, Pro, Enterprise), supporto tecnico, proprietà intellettuale in Italia.
-Rispondi in italiano, professionale ma accessibile. Se non sai qualcosa, suggerisci supporto umano.`;
-
-    // Prepara conversazione per Gemini
-    const contents = [];
-    
-    // System prompt
-    contents.push({
-      role: 'user',
-      parts: [{ text: systemPrompt }]
-    });
-    contents.push({
-      role: 'model', 
-      parts: [{ text: 'Ho capito. Sono pronto ad assistere gli utenti di BrevettIAmo.' }]
-    });
-
-    // Storico conversazione (ultimi 10 messaggi)
-    if (history && Array.isArray(history)) {
-      history.forEach(msg => {
-        contents.push({
-          role: msg.role === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.text }]
-        });
-      });
-    }
-
-    // Messaggio attuale
-    contents.push({
-      role: 'user',
-      parts: [{ text: message }]
-    });
-
-    // Chiama Google Gemini API
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: contents,
-          generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 800,
-            topP: 0.9
-          },
-          safetySettings: [
-            { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-            { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' }
-          ]
-        })
-      }
-    );
-
-    const data = await response.json();
-    
-    if (data.error) {
-      console.error('Gemini API error:', data.error);
-      return res.status(500).json({ 
-        error: 'Errore API Gemini',
-        details: data.error.message 
-      });
-    }
-
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 
-                  'Mi dispiace, non sono riuscito a generare una risposta. Riprova più tardi.';
-
-    res.json({ 
-      reply,
-      timestamp: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('Server error:', error);
-    res.status(500).json({ 
-      error: 'Errore interno del server',
-      message: error.message 
-    });
-  }
-});
-
-// Aggiorna health check per includere stato Gemini
+// ========== HEALTH CHECK ==========
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -200,21 +102,10 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
-// ========== HEALTH CHECK ==========
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    service: 'BrevettIAmo Backend',
-    version: '1.0.0',
-    intelligenze: 19,
-    timestamp: new Date().toISOString()
-  });
-});
 
 // ========== LISTA 19 SERVIZI ==========
 app.get('/api/services/list', async (req, res) => {
   try {
-    // Carica prezzi dinamici da Supabase se disponibili
     const { data: config } = await supabase
       .from('config_prezzi')
       .select('dati')
@@ -243,7 +134,6 @@ app.get('/api/services/list', async (req, res) => {
       { id: 'cad', name: 'Disegno CAD Professionale', prezzo: 99, credits: 4 }
     ];
     
-    // Se ci sono prezzi dinamici, usa quelli
     if (config && config.dati) {
       const prezziDinamici = config.dati;
       services = services.map(s => {
@@ -306,7 +196,6 @@ app.post('/api/services/execute', async (req, res) => {
     return res.status(400).json({ error: 'serviceId e input richiesti' });
   }
 
-  // Verifica abbonamento (blocco per non paganti)
   const abbonamento = await verificaAbbonamento(userId);
   
   if (!abbonamento.valido) {
@@ -318,7 +207,6 @@ app.post('/api/services/execute', async (req, res) => {
     });
   }
 
-  // Verifica che il servizio sia attivo
   const { data: config } = await supabase
     .from('config_prezzi')
     .select('dati')
@@ -375,7 +263,6 @@ app.post('/api/services/execute', async (req, res) => {
     const data = await response.json();
     const result = data.choices[0].message.content;
 
-    // Salva su Supabase
     await supabase.from('service_usage').insert({
       user_id: userId || 'anon',
       service_id: serviceId,
@@ -384,7 +271,6 @@ app.post('/api/services/execute', async (req, res) => {
       created_at: new Date().toISOString()
     });
 
-    // Decrementa servizi rimanenti
     if (userId && abbonamento.valido) {
       await supabase.rpc('decrementa_servizi', { user_id: userId });
     }
@@ -423,8 +309,11 @@ app.use((err, req, res, next) => {
 // ========== CONFIGURAZIONI ADMIN ==========
 const configRouter = require('./routes/config-api');
 app.use('/api', configRouter);
+
+// ========== AVVIO SERVER (DEVE ESSERE L'ULTIMO!) ==========
 app.listen(PORT, () => {
   console.log(`BrevettIAmo 19 Intelligenze - Porta ${PORT}`);
   console.log(`DB: ${process.env.SUPABASE_URL ? 'CONNESSO' : 'MANCANTE'}`);
   console.log(`AI: ${process.env.OPENROUTER_API_KEY ? 'CONNESSA' : 'MANCANTE'}`);
+  console.log(`GEMINI: ${process.env.GEMINI_API_KEY ? 'CONFIGURATO' : 'MANCANTE'}`);
 });
