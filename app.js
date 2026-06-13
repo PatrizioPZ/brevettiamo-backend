@@ -350,7 +350,7 @@ app.post('/chat', async (req, res) => {
         'X-Title': 'BrevettIAmo'
       },
       body: JSON.stringify({
-      model: 'mistralai/mistral-7b-instruct:free',
+    curl -X POST https://brevettiamo-backend.onrender.com/chat -H "Content-Type: application/json" -d "{\"message\":\"ciao\"}"
         messages: [
           {
             role: 'system',
