@@ -257,7 +257,7 @@ app.post('/api/services/execute', async (req, res) => {
         'X-Title': 'BrevettIAmo'
       },
       body: JSON.stringify({
-       Fix modello OpenRouter - mistral-7b-instruct:free
+      model: 'mistralai/mistral-7b-instruct:free',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Lingua: ${language}\n\n${input}` }
