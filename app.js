@@ -79,6 +79,7 @@ async function sendMessage() {
   if (!text) return;
   input.value = '';
   addMessage(text, true);
+  
 
   try {
     const response = await fetch('https://brevettiamo-backend.onrender.com/chat', {
